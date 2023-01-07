@@ -22,7 +22,7 @@ class AshenImage {
     uint height;
     ubyte[] data;
 
-    void Release() {
+    void release() {
         data = null;
         width = 0;
         height = 0;

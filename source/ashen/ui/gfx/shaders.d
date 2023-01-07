@@ -13,6 +13,7 @@ import bindbc.opengl;
 import core.memory:GC;
 import core.stdc.string : strlen;
 
+import ashen.ui.linear;
 import ashen.ui.utils.dispatch;
 import ashen.ui : HResult, bstring, Succeeded;
 
@@ -61,6 +62,30 @@ public abstract class AshenShader {
 			glDeleteShader(vertex);
 			glDeleteShader(fragment);
 			glDeleteProgram(program);
+		}
+
+		void SetMatrix(bstring str, ref AshenMatrix4f matrix) {
+			if ((str in uniforms) is null)
+				throw new AshenPoorImplementationException("Unknown Uniform.");
+			glUniformMatrix4fv(uniforms[str], 1, false, matrix.matrix[0].ptr);
+		}
+
+		void SetVector(bstring str, float2 vector) {
+			if ((str in uniforms) is null)
+				throw new AshenPoorImplementationException("Unknown Uniform.");
+			glUniform2f(uniforms[str], vector.x, vector.y);
+		}
+
+		void SetFloat(bstring str, float v) {
+			if ((str in uniforms) is null)
+				throw new AshenPoorImplementationException("Unknown Uniform.");
+			glUniform1f(uniforms[str], v);
+		}
+
+		void SetInt(bstring str, int v) {
+			if ((str in uniforms) is null)
+				throw new AshenPoorImplementationException("Unknown Uniform.");
+			glUniform1i(uniforms[str], v);
 		}
 }
 

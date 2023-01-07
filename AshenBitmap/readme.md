@@ -11,4 +11,4 @@ Command Line Arguments:
 
 # Building
 Well, you'll need dub (just install a D compiler and it should already come with it)
-and SDL2 in this case only SDL2_Image.
+and SDL2 in this case only SDL2_Image and its respective libraries.

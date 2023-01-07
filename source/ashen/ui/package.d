@@ -4,11 +4,12 @@ import bindbc.glfw;
 import bindbc.opengl;
 
 public import ashen.ui.img;
+public import ashen.ui.linear;
 public import ashen.ui.gfx.color;
 public import ashen.ui.utils.dispatch;
 
 import ashen.ui.gfx.shaders;
-import ashen.ui.gfx.rectshader;
+import ashen.ui.gfx.rectangle;
 
 // "binding" string
 alias bstring = const(char)*;
