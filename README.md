@@ -1,4 +1,4 @@
-![sampleicon.png](./sampleicon.png)
+![sampleicon.png](./logo.png)
 
 # An UI Framework designed to be lightweight.
 This is the project that will power Irie Composer.
