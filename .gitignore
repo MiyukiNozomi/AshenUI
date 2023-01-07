@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/ashenui
+ashenui.so
+ashenui.dylib
+ashenui.dll
+ashenui.a
+ashenui.lib
+ashenui-test-*
+*.exe
+*.o
+*.obj
+*.lst

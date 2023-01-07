@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/miyukiimageformat
+miyukiimageformat.so
+miyukiimageformat.dylib
+miyukiimageformat.dll
+miyukiimageformat.a
+miyukiimageformat.lib
+miyukiimageformat-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst

@@ -1,0 +1,16 @@
+{
+	"authors": [
+		"Marija"
+	],
+	"copyright": "Copyright © 2023, Marija",
+	"dependencies": {
+		"bindbc-sdl": "~>1.2.4"
+	},
+	"versions": [
+		"SDL_Image"
+	],
+	"description": "A minimal D application.",
+	"license": "proprietary",
+	"name": "ashenimage",
+	"targetName": "ashen-image"
+}
