@@ -13,3 +13,4 @@ ashenui-test-*
 *.o
 *.obj
 *.lst
+*.dll
