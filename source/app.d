@@ -34,6 +34,9 @@ void main() {
 
 	while (window.isVisible()) {
 		window.prepare(&AshenColor.Blue);
+
+        ashenDrawRectangle();
+
 		window.swapBuffers();
 	}
 

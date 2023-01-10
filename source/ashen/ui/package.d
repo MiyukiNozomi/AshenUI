@@ -122,7 +122,7 @@ private HResult ashenCreateWindow(bstring title, int width, int height, out Ashe
 
 	aw.colorRectShader = new AshenColorRectShader();
 
-	ashenInitRenderer();
+	ashenInternal_InitRenderer();
 
 	window = aw;
 
