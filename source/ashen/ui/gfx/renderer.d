@@ -2,8 +2,11 @@ module ashen.ui.gfx.renderer;
 
 import bindbc.opengl;
 
-import ashen.ui.utils.dispatch;
+import ashen.ui;
 
+import ashen.ui.gfx.shaders;
+import ashen.ui.gfx.rectshader;
+import ashen.ui.utils.dispatch;
 
 public:
 /**
@@ -18,19 +21,22 @@ void ashenInternal_InitRenderer() {
         -1,  1,
          1,  1
     ], 2, true);
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    colorRectShader = new AshenColorRectShader();
 }
 
 void ashenDrawRectangle() {
+    colorRectShader.Bind();
+
     rectangle.bind();
     glDrawArrays(GL_TRIANGLES, 0, rectangle.vertexCount);
     rectangle.unbind();
     ashenInternal_CheckGLErrors();
+
+    colorRectShader.Unbind();
 }
 
 private: 
-
+AshenColorRectShader colorRectShader;
 Drawable rectangle;
 
 // VertexArray, wharever;

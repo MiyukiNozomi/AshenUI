@@ -25,8 +25,6 @@ class AshenWindow {
 		int width;
 		int height;
 
-		AshenColorRectShader colorRectShader;
-
 	public:
 	// Window Controls
         void setIcon(AshenImage icon) {
@@ -120,11 +118,10 @@ private HResult ashenCreateWindow(bstring title, int width, int height, out Ashe
 		return HResult.OkayWarnings;
 	}
 
-	aw.colorRectShader = new AshenColorRectShader();
-
 	ashenInternal_InitRenderer();
 
 	window = aw;
+	createdWindow = aw;
 
 	return HResult.Okay;
 }
@@ -133,8 +130,6 @@ private HResult ashenCreateWindow(bstring title, int width, int height, out Ashe
 	Releases Objects allocated by the library.
 */
 void ashenTerminate() {
-	createdWindow.colorRectShader.Release();
-
 	glfwDestroyWindow(createdWindow.window);
 	glfwTerminate();
 }
