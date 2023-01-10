@@ -1,5 +1,24 @@
 module ashen.ui.img;
 
+/**
+    Yes, ashenui has its own image format;
+    screw compressed image formats, its not like you're 
+    going to be browsing a website anyway? are you?
+
+    the actual reason is that uncompressed formats are
+    just easier to deal with and faster to load.
+    Also, its designed to be a simpler format; since 
+    BMP has a stupid 40 char header in 24 bit and 108 char header
+    in 32 bit, who the hell had that idea?
+
+    since, the only way for you to know if its 32 or 24 bit is by reading that 
+    same header!!!!!
+
+    Either way, fell free to take a look at AshenBitmap/ on the
+    main folder of the repository, there's an explanation there
+    of the format.
+*/
+
 import std.conv;
 import std.stdio;
 import std.array;
@@ -22,8 +41,12 @@ class AshenImage {
     uint height;
     ubyte[] data;
 
-    void release() {
+    void Release() {
+        // ok ok,you may say "wtf! isn't this a memory leak?!?!??!?!"
+        // if it was C or C++, of course; however: D has a GC
+        // so, lets leave it to the GC to clean it up.
         data = null;
+
         width = 0;
         height = 0;
         format = AshenFormat.Invalid; 
@@ -35,7 +58,7 @@ HResult ashenLoadImage(string filename,
     try {
         File f = File(filename, "rb");   
         ubyte[12] AMPHeader = [
-            0, 0, 0,
+            0, 0, 0,    // margic 3 characters: 'AMP'
             0, 0, 0, 0, // width
             0, 0, 0, 0, // height
             0,         // format, 3 for RGB and 4 for RGBA.
@@ -47,10 +70,13 @@ HResult ashenLoadImage(string filename,
             return ashenInternal_DispatchError(HResult.InvalidFormat, "ashen/ui/img", "Not a Ashen Bitmap.");
         }
 
+        // bitwise our way back to the original size
         int width  = (AMPHeader[3]) | (AMPHeader[4] <<  8) | (AMPHeader[5] << 16) | (AMPHeader[6]  << 24);   
         int height = (AMPHeader[7]) | (AMPHeader[8] <<  8) | (AMPHeader[9] << 16) | (AMPHeader[10] << 24);   
+
         int format = AMPHeader[11];
 
+        // AshenBitmap can only be either RGBA or RGB.
         if (format != 3 && format != 4) {
             return ashenInternal_DispatchError(HResult.InvalidFormat, "ashen/ui/img", "Invalid Image Format");
         }
@@ -64,6 +90,8 @@ HResult ashenLoadImage(string filename,
         image.data = data;
         image.width = width;
         image.height = height;
+        
+        // 3 == RGB; 4 == RGBA
         image.format = cast(AshenFormat) format;
         outImage = image;
 

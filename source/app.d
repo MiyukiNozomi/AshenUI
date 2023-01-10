@@ -28,7 +28,7 @@ void main() {
     
     window.setIcon(icon);
 
-    icon.release();
+    icon.Release();
 
 	window.defineInterval(2);
 

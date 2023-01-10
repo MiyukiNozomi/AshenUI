@@ -4,12 +4,12 @@ import bindbc.glfw;
 import bindbc.opengl;
 
 public import ashen.ui.img;
-public import ashen.ui.linear;
 public import ashen.ui.gfx.color;
+public import ashen.ui.gfx.renderer;
 public import ashen.ui.utils.dispatch;
 
 import ashen.ui.gfx.shaders;
-import ashen.ui.gfx.rectangle;
+import ashen.ui.gfx.rectshader;
 
 // "binding" string
 alias bstring = const(char)*;
@@ -28,7 +28,12 @@ class AshenWindow {
 		AshenColorRectShader colorRectShader;
 
 	public:
+	// Window Controls
         void setIcon(AshenImage icon) {
+			if (icon.format == AshenFormat.Invalid) {
+				ashenInternal_DispatchError(HResult.InvalidParameter, "ashen/ui","Invalid Image Format.");
+				return;
+			}
             GLFWimage[1] images;
     
             images[0].width = icon.width;
@@ -40,6 +45,10 @@ class AshenWindow {
         }
 
 		void defineInterval(int interval) {
+			if (interval > 3 || interval < 0) {
+				ashenInternal_DispatchError(HResult.InvalidParameter, "ashen/ui", "interval should be between 0 and 3.");
+				return;
+			}
 			glfwSwapInterval(interval);
 		}
 
@@ -52,6 +61,7 @@ class AshenWindow {
 		}
 
 		void prepare(AshenColor* color) {
+			ashenInternal_CheckGLErrors();
 			glClear(GL_COLOR_BUFFER_BIT);
 			glClearColor(color.r, color.g, color.b, color.a);
 
@@ -61,8 +71,12 @@ class AshenWindow {
 		void swapBuffers() {
 			glfwSwapBuffers(window);
 		}
+	// end Window Controls
 }
 
+/**
+	Initializes the Libraries used by AshenUI and creates a window.
+*/
 HResult ashenInit(bstring title, int width, int height, out AshenWindow window) {
 	GLFWSupport glfwRet = loadGLFW();
 	if (glfwRet != glfwSupport) {
@@ -80,12 +94,20 @@ HResult ashenInit(bstring title, int width, int height, out AshenWindow window) 
 	return ashenCreateWindow(title, width, height, window);
 }
 
+/**
+	Creates a window, duh
+*/
 private HResult ashenCreateWindow(bstring title, int width, int height, out AshenWindow window) {
 	AshenWindow aw = new AshenWindow();
 	
+	glfwWindowHint(GLFW_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_VERSION_MINOR, 3);
+
 	aw.window = glfwCreateWindow(width, height, title, null, null);
+	aw.width  = width;
+	aw.height = height;
 	if (!aw.window)
-		return HResult.ObjCreationFailure;
+		return ashenInternal_DispatchError(HResult.ObjCreationFailure, "ashen/ui", "Unable to create window.");
 
 	glfwMakeContextCurrent(aw.window);
 
@@ -100,35 +122,39 @@ private HResult ashenCreateWindow(bstring title, int width, int height, out Ashe
 
 	aw.colorRectShader = new AshenColorRectShader();
 
+	ashenInitRenderer();
+
 	window = aw;
 
 	return HResult.Okay;
 }
 
+/**
+	Releases Objects allocated by the library.
+*/
 void ashenTerminate() {
+	createdWindow.colorRectShader.Release();
+
+	glfwDestroyWindow(createdWindow.window);
 	glfwTerminate();
 }
 
+/**
+	I tried to mimic Win32's HRESULT thing, 
+	only used for stuff that may break everything if fail or
+	when dealing with communication with the operating system.
+*/
 enum HResult {
+	InvalidFormat,
+	ExceptionCatched,
+
 	BadLibraryLoad,
 	MissingLibrary,
-	
-	OutOfMemory,
-
 	LibInitFailure,
 
+	InvalidParameter,
+
 	ObjCreationFailure,
-	
-	ShaderCompileFailure,
-	ShaderProgramCreationFailure,
-	
-	ExceptionCatched,
-	
-	FileNotFound,
-	InvalidFormat,
-	UnsupportedBitsPerPixel,
-	
-	Errors,
 
 	OkayWarnings,
 	Okay
@@ -136,18 +162,7 @@ enum HResult {
 
 auto Succeeded(HResult res) {return res == HResult.Okay || res == HResult.OkayWarnings;}
 
-HResult CheckGLErrors() {
-	GLenum err = glGetError();
-	
-	if (err == GL_NO_ERROR)
-		return HResult.Okay;
-	
-	//TODO : Implement DispatchError and TransmitError functions
-	switch(err) {
-		default: break;
-	}
-	return HResult.Errors;
-}
+//// GLFW events area
 
 extern(C)
 void glfwAshenWindowCallback(GLFWwindow* wnd, int w, int h) nothrow {

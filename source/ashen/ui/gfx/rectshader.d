@@ -1,4 +1,4 @@
-module ashen.ui.gfx.rectangle;
+module ashen.ui.gfx.rectshader;
 
 import ashen.ui : bstring;
 import ashen.ui.gfx.shaders;
