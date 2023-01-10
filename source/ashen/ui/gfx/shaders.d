@@ -13,6 +13,7 @@ import bindbc.opengl;
 import core.memory:GC;
 import core.stdc.string : strlen;
 
+import ashen.ui.gfx.color;
 import ashen.ui.utils.dispatch;
 import ashen.ui : HResult, bstring, Succeeded;
 
@@ -52,6 +53,13 @@ public abstract class AshenShader {
 					throw new AshenPoorImplementationException(format("Uniform not found: %s", s));
 				}
 			}
+		}
+
+		void SetColor(bstring uniform, AshenColor* color) {
+			if ((uniform in uniforms) is null) {
+				throw new AshenPoorImplementationException("Unknown uniform");
+			}
+			glUniform4f(uniforms[uniform], color.r, color.g, color.b, color.a);
 		}
 
 		void Bind()   {glUseProgram(program);}

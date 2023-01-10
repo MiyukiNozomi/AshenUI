@@ -6,7 +6,7 @@ import ashen.ui.gfx.shaders;
 public class AshenColorRectShader : AshenShader {
 
     public this() {
-        super(ashenInternal_Rectvertexsource, ashenInternal_Rectfragmentsource, []);
+        super(ashenInternal_Rectvertexsource, ashenInternal_Rectfragmentsource, ["color"]);
     }
 
 }
@@ -31,6 +31,8 @@ in vec2 uvCoords;
 
 out vec4 out_Color;
 
+uniform vec4 color;
+
 void main() {
-    out_Color = vec4(uvCoords.x, 0, uvCoords.y, 1.0);
+    out_Color = color;
 }";

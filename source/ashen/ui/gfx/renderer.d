@@ -4,6 +4,7 @@ import bindbc.opengl;
 
 import ashen.ui;
 
+import ashen.ui.gfx.color;
 import ashen.ui.gfx.shaders;
 import ashen.ui.gfx.rectshader;
 import ashen.ui.utils.dispatch;
@@ -22,10 +23,13 @@ void ashenInternal_InitRenderer() {
          1,  1
     ], 2, true);
     colorRectShader = new AshenColorRectShader();
+
+    glEnable(GL_BLEND);
 }
 
-void ashenDrawRectangle() {
+void ashenDrawRectangle(AshenColor* color) {
     colorRectShader.Bind();
+    colorRectShader.SetColor("color", color);
 
     rectangle.bind();
     glDrawArrays(GL_TRIANGLES, 0, rectangle.vertexCount);
