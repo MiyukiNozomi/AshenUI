@@ -19,6 +19,8 @@ module ashen.ui.img;
     of the format.
 */
 
+import bindbc.opengl : GLuint;
+
 import std.conv;
 import std.stdio;
 import std.array;
@@ -28,10 +30,13 @@ import core.memory : GC;
 import ashen.ui : HResult, bstring;
 import ashen.ui.utils.dispatch;
 
+import ashen.ui.gfx.renderer;
+
 enum AshenFormat {
     RGBA = 4,
     RGB = 3,
 
+    GPUSide = -3,
     Invalid = -1
 }
 
@@ -41,7 +46,28 @@ class AshenImage {
     uint height;
     ubyte[] data;
 
-    void Release() {
+    GLuint texId;
+
+    /**
+        Just a warning,
+        calling this function will make it unusable in the CPU
+        side for obvious reasons.
+
+    */
+    void pushToGPU() {
+        texId = ashenInternal_SendImageToGPU(this);
+
+        format = AshenFormat.GPUSide;
+        data = null;
+        width = 0;
+        height = 0;
+    }
+
+    void release() {
+        if (format == AshenFormat.GPUSide) {
+            ashenInternal_ReleaseTexture(this);
+            return;
+        }
         // ok ok,you may say "wtf! isn't this a memory leak?!?!??!?!"
         // if it was C or C++, of course; however: D has a GC
         // so, lets leave it to the GC to clean it up.

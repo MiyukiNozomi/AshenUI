@@ -130,6 +130,8 @@ private HResult ashenCreateWindow(bstring title, int width, int height, out Ashe
 	Releases Objects allocated by the library.
 */
 void ashenTerminate() {
+	ashenInternal_ReleaseRenderer();
+
 	glfwDestroyWindow(createdWindow.window);
 	glfwTerminate();
 }

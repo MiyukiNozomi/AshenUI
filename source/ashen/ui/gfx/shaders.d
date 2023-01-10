@@ -62,6 +62,13 @@ public abstract class AshenShader {
 			glUniform4f(uniforms[uniform], color.r, color.g, color.b, color.a);
 		}
 
+		void SetFloat(bstring uniform, float v) {
+			if ((uniform in uniforms) is null) {
+				throw new AshenPoorImplementationException("Unknown uniform");
+			}
+			glUniform1f(uniforms[uniform], v);
+		}
+
 		void Bind()   {glUseProgram(program);}
 		void Unbind() {glUseProgram(0);}
 

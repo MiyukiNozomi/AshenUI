@@ -20,25 +20,40 @@ void main() {
         return;
     }
 
+    version(BigEndian)  {
+        writeln("BE");
+    } 
+    version(LittleEndian) {
+        writeln("LE");
+    }
+
     AshenImage icon;
     if (!Succeeded(ashenLoadImage("sampleicon.amp", icon))) {
         writeln("Failed to load icon!");
         PrintOutErrors();
     }
+
+    AshenImage logo;
+    if (!Succeeded(ashenLoadImage("logo.amp", logo))) {
+        PrintOutErrors();
+        return;
+    }
     
     window.setIcon(icon);
 
-    icon.Release();
+    icon.release();
 
 	window.defineInterval(2);
 
 	while (window.isVisible()) {
 		window.prepare(&AshenColor.Blue);
 
-        ashenDrawRectangle(&AshenColor.Green);
+        ashenDrawRectangle(logo);
 
 		window.swapBuffers();
 	}
 
+    logo.release();
+    
 	ashenTerminate();
 }

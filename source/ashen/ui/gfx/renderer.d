@@ -23,6 +23,7 @@ void ashenInternal_InitRenderer() {
          1,  1
     ], 2, true);
     colorRectShader = new AshenColorRectShader();
+    texRectShader = new AshenTexturedRectShader();
 
     glEnable(GL_BLEND);
 }
@@ -39,8 +40,42 @@ void ashenDrawRectangle(AshenColor* color) {
     colorRectShader.Unbind();
 }
 
+void ashenDrawRectangle(AshenImage image, AshenColor* tint = null) {
+    if (image.format != AshenFormat.GPUSide) {
+        image.pushToGPU();
+    }
+    texRectShader.Bind();
+
+    if (tint !is null) {
+        texRectShader.SetFloat("isGrayScale", 1);
+        texRectShader.SetColor("color", tint);
+    } else {
+        texRectShader.SetFloat("isGrayScale", 0);
+    }
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, image.texId);
+
+    rectangle.bind();
+    glDrawArrays(GL_TRIANGLES, 0, rectangle.vertexCount);
+    rectangle.unbind();
+    ashenInternal_CheckGLErrors();
+
+    texRectShader.Unbind();
+}
+
+void ashenInternal_ReleaseTexture(AshenImage image) {
+    glDeleteTextures(1, &image.texId);
+}
+
+void ashenInternal_ReleaseRenderer() {
+    colorRectShader.Release();
+    texRectShader.Release();
+}
+
 private: 
 AshenColorRectShader colorRectShader;
+AshenTexturedRectShader texRectShader;
 Drawable rectangle;
 
 // VertexArray, wharever;
@@ -92,6 +127,41 @@ Drawable ashenMakeDrawable(float[] inputVertices, int dimensions, GLboolean norm
     ashenInternal_CheckGLErrors();
 
     return Drawable(vao, vbo, vertexCount);
+}
+
+/**
+    Sends an image to the GPU side.
+    the API will do that on its own, no need to call AshenImage#pushToGPU
+    just try to render something that uses that image
+
+    Actually, why are you calling internal functions anyway?
+*/
+public GLuint ashenInternal_SendImageToGPU(AshenImage image) {
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // size is useless in this context
+    size_t size;
+
+    void* pixels = ashenToCArray!ubyte(image.data, size);
+    GLenum format = image.format == AshenFormat.RGB ? GL_RGB : GL_RGBA;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format, image.width, image.height, 0, format,
+                 GL_UNSIGNED_BYTE, pixels);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    ashenInternal_CheckGLErrors();
+
+    GC.free(pixels);
+    return texture;
 }
 
 // C APIs don't really recognize dynamic
