@@ -30,7 +30,7 @@ void ashenInternal_InitRenderer() {
     glEnable(GL_BLEND);
 }
 
-void ashenDrawRectangle(AshenColor* color, float x, float y,
+void ashenDrawRectangle(AshenColor color, float x, float y,
                                            float w, float h,
                                            float r = 0) {
     colorRectShader.Bind();
@@ -50,10 +50,10 @@ void ashenDrawRectangle(AshenColor* color, float x, float y,
 
 void ashenDrawRectangle(AshenImage image, float x, float y,
                                           float w, float h,
-                                          AshenColor* tint = null,
+                                          AshenColor tint = null,
                                           float r = 0) {
     if (image.format != AshenFormat.GPUSide) {
-        image.pushToGPU();
+        ashenInternal_SendImageToGPU(image);
     }
     texRectShader.Bind();
 
@@ -96,14 +96,14 @@ private:
 */
 void ashenInternal_SendProjection(AshenShader shader) {
     if (createdWindow.sizeUpdated) {
-        if (!orthoProjection) orthoProjection = ashenCreateMatrix();
-        orthoProjection = ashenOrthographic(orthoProjection, createdWindow.width, createdWindow.height);
+        if (!projection) projection = ashenCreateMatrix();
+        projection = ashenOrthographic(projection, createdWindow.width, createdWindow.height);
         createdWindow.sizeUpdated = false;
     }
-    shader.SetMatrix("projection", orthoProjection);
+    shader.SetMatrix("projection", projection);
 }
 
-AshenMat4 orthoProjection;
+AshenMat4 projection;
 AshenColorRectShader colorRectShader;
 AshenTexturedRectShader texRectShader;
 Drawable rectangle;
@@ -156,17 +156,16 @@ Drawable ashenMakeDrawable(float[] inputVertices, int dimensions, GLboolean norm
 
     ashenInternal_CheckGLErrors();
 
+    GC.free(verticesPtr);
     return Drawable(vao, vbo, vertexCount);
 }
 
 /**
-    Sends an image to the GPU side.
-    the API will do that on its own, no need to call AshenImage#pushToGPU
-    just try to render something that uses that image
-
-    Actually, why are you calling internal functions anyway?
+    Just a warning,
+    calling this function will make the image unusable in
+    the CPU side for obvious reasons.
 */
-public GLuint ashenInternal_SendImageToGPU(AshenImage image) {
+public void ashenInternal_SendImageToGPU(AshenImage image) {
     GLuint texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -184,14 +183,18 @@ public GLuint ashenInternal_SendImageToGPU(AshenImage image) {
                  GL_UNSIGNED_BYTE, pixels);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glBindTexture(GL_TEXTURE_2D, 0);
     ashenInternal_CheckGLErrors();
 
     GC.free(pixels);
-    return texture;
+    image.texId = texture;
+    image.format = AshenFormat.GPUSide;
+    image.data = null;
+    image.width = 0;
+    image.height = 0;
 }
 
 // C APIs don't really recognize dynamic

@@ -17,8 +17,12 @@ public class AshenTexturedRectShader : AshenShader {
 
     public this() {
         super(ashenInternal_Rectvertexsource, ashenInternal_RectImagefragmentsource, [
-            "projection","transformation","color","isGrayScale"
+            "projection","transformation","color","isGrayScale","tex"
         ]);
+
+        Bind();
+        SetInt("tex", 0);
+        Unbind();
     }
 
 }

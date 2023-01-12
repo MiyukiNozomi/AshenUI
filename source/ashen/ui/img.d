@@ -48,21 +48,6 @@ class AshenImage {
 
     GLuint texId;
 
-    /**
-        Just a warning,
-        calling this function will make it unusable in the CPU
-        side for obvious reasons.
-
-    */
-    void pushToGPU() {
-        this.texId = ashenInternal_SendImageToGPU(this);
-
-        format = AshenFormat.GPUSide;
-        data = null;
-        width = 0;
-        height = 0;
-    }
-
     void release() {
         if (format == AshenFormat.GPUSide) {
             ashenInternal_ReleaseTexture(this);

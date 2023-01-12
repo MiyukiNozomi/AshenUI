@@ -39,22 +39,19 @@ void main() {
 	window.defineInterval(2);
 
     AshenImage doritos;
-    ashenLoadImage("test-pictures/hahhaa.amp", doritos);
+    ashenLoadImage("test-pictures/doritos.amp", doritos);
 
     AshenImage sniper;
-    if (!Succeeded(ashenLoadImage("test-pictures/sniper.amp", sniper))) {
-        writeln("idiot");
-    }
-
+    ashenLoadImage("test-pictures/sniper.amp", sniper);
 
 	while (window.isVisible()) {
-		window.prepare(&AshenColor.White);
+		window.prepare(AshenColor.Orange);
 
-        ashenDrawRectangle(doritos, 12, 12, 138, 256);
-       // ashenDrawRectangle(sniper, window.getWidth() - sniper.width, 0, sniper.width, sniper.height);
+       // ashenDrawRectangle(doritos, 12, 12, 138, 256);
+      //  ashenDrawRectangle(sniper, 120, 0, sniper.width, sniper.height);
 
-       // ashenDrawRectangle(&AshenColor.Black, 0, 0, 120, 120);
-       // ashenDrawRectangle(&AshenColor.Magenta, 12, 12, 120, 120);
+       // ashenDrawRectangle(AshenColor.Black, 0, 0, 120, 120);
+       // ashenDrawRectangle(AshenColor.Magenta, 12, 12, 120, 120);
 
 		window.swapBuffers();
 	}

@@ -61,7 +61,7 @@ class AshenWindow {
 			return !glfwWindowShouldClose(window);
 		}
 
-		void prepare(AshenColor* color) {
+		void prepare(AshenColor color) {
 			ashenInternal_CheckGLErrors();
 			glClear(GL_COLOR_BUFFER_BIT);
 			glClearColor(color.r, color.g, color.b, color.a);
@@ -92,6 +92,9 @@ HResult ashenInit(bstring title, int width, int height, out AshenWindow window) 
 
 	if (!glfwInit())
 		return HResult.LibInitFailure;
+
+	AshenColor.makeDefaultColors();
+
 	return ashenCreateWindow(title, width, height, window);
 }
 

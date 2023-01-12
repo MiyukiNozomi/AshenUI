@@ -57,7 +57,7 @@ public abstract class AshenShader {
 			}
 		}
 
-		void SetColor(bstring uniform, AshenColor* color) {
+		void SetColor(bstring uniform, AshenColor color) {
 			if ((uniform in uniforms) is null) {
 				throw new AshenPoorImplementationException("Unknown uniform");
 			}
@@ -69,6 +69,13 @@ public abstract class AshenShader {
 				throw new AshenPoorImplementationException("Unknown uniform");
 			}
 			glUniform1f(uniforms[uniform], v);
+		}
+
+		void SetInt(bstring uniform, int v) {
+			if ((uniform in uniforms) is null) {
+				throw new AshenPoorImplementationException("Unknown uniform");
+			}
+			glUniform1i(uniforms[uniform], v);
 		}
 
 		void SetMatrix(bstring uniform, AshenMat4 matrix) {
