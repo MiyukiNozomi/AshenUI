@@ -23,7 +23,7 @@ struct AshenColor {
 	}
 
 	static:
-		auto White = AshenColor();
+		auto White = AshenColor(255,255,255);
 		auto Black = AshenColor(0,0,0);
 		auto Red   = AshenColor(255, 0, 0);
 		auto Green = AshenColor(0, 255, 0);

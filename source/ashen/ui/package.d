@@ -24,9 +24,12 @@ class AshenWindow {
 		GLFWwindow* window;
 		int width;
 		int height;
+		bool sizeUpdated;
 
 	public:
 	// Window Controls
+		int getWidth() {return width;}
+		int getHeight() {return height;}
         void setIcon(AshenImage icon) {
 			if (icon.format == AshenFormat.Invalid) {
 				ashenInternal_DispatchError(HResult.InvalidParameter, "ashen/ui","Invalid Image Format.");
@@ -104,6 +107,7 @@ private HResult ashenCreateWindow(bstring title, int width, int height, out Ashe
 	aw.window = glfwCreateWindow(width, height, title, null, null);
 	aw.width  = width;
 	aw.height = height;
+	aw.sizeUpdated = true;
 	if (!aw.window)
 		return ashenInternal_DispatchError(HResult.ObjCreationFailure, "ashen/ui", "Unable to create window.");
 
@@ -166,6 +170,7 @@ void glfwAshenWindowCallback(GLFWwindow* wnd, int w, int h) nothrow {
 	if (createdWindow !is null) {
 		createdWindow.width = w;
 		createdWindow.height = h;
+		createdWindow.sizeUpdated = true;
 	}
 	glViewport(0, 0, w, h);
 }

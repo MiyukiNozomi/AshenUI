@@ -55,7 +55,7 @@ class AshenImage {
 
     */
     void pushToGPU() {
-        texId = ashenInternal_SendImageToGPU(this);
+        this.texId = ashenInternal_SendImageToGPU(this);
 
         format = AshenFormat.GPUSide;
         data = null;

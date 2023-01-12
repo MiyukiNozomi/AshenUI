@@ -31,29 +31,36 @@ void main() {
     if (!Succeeded(ashenLoadImage("sampleicon.amp", icon))) {
         writeln("Failed to load icon!");
         PrintOutErrors();
-    }
-
-    AshenImage logo;
-    if (!Succeeded(ashenLoadImage("logo.amp", logo))) {
-        PrintOutErrors();
-        return;
-    }
-    
+    }    
     window.setIcon(icon);
 
     icon.release();
 
 	window.defineInterval(2);
 
-	while (window.isVisible()) {
-		window.prepare(&AshenColor.Blue);
+    AshenImage doritos;
+    ashenLoadImage("test-pictures/hahhaa.amp", doritos);
 
-        ashenDrawRectangle(logo);
+    AshenImage sniper;
+    if (!Succeeded(ashenLoadImage("test-pictures/sniper.amp", sniper))) {
+        writeln("idiot");
+    }
+
+
+	while (window.isVisible()) {
+		window.prepare(&AshenColor.White);
+
+        ashenDrawRectangle(doritos, 12, 12, 138, 256);
+       // ashenDrawRectangle(sniper, window.getWidth() - sniper.width, 0, sniper.width, sniper.height);
+
+       // ashenDrawRectangle(&AshenColor.Black, 0, 0, 120, 120);
+       // ashenDrawRectangle(&AshenColor.Magenta, 12, 12, 120, 120);
 
 		window.swapBuffers();
 	}
 
-    logo.release();
+    doritos.release();
+    sniper.release();
     
 	ashenTerminate();
 }

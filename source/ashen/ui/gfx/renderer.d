@@ -4,6 +4,8 @@ import bindbc.opengl;
 
 import ashen.ui;
 
+import ashen.ui.math.matrix;
+
 import ashen.ui.gfx.color;
 import ashen.ui.gfx.shaders;
 import ashen.ui.gfx.rectshader;
@@ -15,11 +17,11 @@ public:
 */
 void ashenInternal_InitRenderer() {
     rectangle = ashenMakeDrawable([
-        -1, -1,
-        -1,  1,
-         1, -1,
-         1, -1,
-        -1,  1,
+         0,  0,
+         0,  1,
+         1,  0,
+         1,  0,
+         0,  1,
          1,  1
     ], 2, true);
     colorRectShader = new AshenColorRectShader();
@@ -28,9 +30,15 @@ void ashenInternal_InitRenderer() {
     glEnable(GL_BLEND);
 }
 
-void ashenDrawRectangle(AshenColor* color) {
+void ashenDrawRectangle(AshenColor* color, float x, float y,
+                                           float w, float h,
+                                           float r = 0) {
     colorRectShader.Bind();
     colorRectShader.SetColor("color", color);
+    
+    ashenInternal_SendProjection(colorRectShader);
+
+    colorRectShader.SetMatrix("transformation", ashenTransform(x, y, w, h, r));
 
     rectangle.bind();
     glDrawArrays(GL_TRIANGLES, 0, rectangle.vertexCount);
@@ -40,7 +48,10 @@ void ashenDrawRectangle(AshenColor* color) {
     colorRectShader.Unbind();
 }
 
-void ashenDrawRectangle(AshenImage image, AshenColor* tint = null) {
+void ashenDrawRectangle(AshenImage image, float x, float y,
+                                          float w, float h,
+                                          AshenColor* tint = null,
+                                          float r = 0) {
     if (image.format != AshenFormat.GPUSide) {
         image.pushToGPU();
     }
@@ -52,6 +63,10 @@ void ashenDrawRectangle(AshenImage image, AshenColor* tint = null) {
     } else {
         texRectShader.SetFloat("isGrayScale", 0);
     }
+
+    ashenInternal_SendProjection(texRectShader);
+
+    texRectShader.SetMatrix("transformation", ashenTransform(x, y, w, h, r));
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, image.texId);
@@ -74,6 +89,21 @@ void ashenInternal_ReleaseRenderer() {
 }
 
 private: 
+/**
+    The logic is simple: 
+        if size updated, redo projection.
+    then send it to shader
+*/
+void ashenInternal_SendProjection(AshenShader shader) {
+    if (createdWindow.sizeUpdated) {
+        if (!orthoProjection) orthoProjection = ashenCreateMatrix();
+        orthoProjection = ashenOrthographic(orthoProjection, createdWindow.width, createdWindow.height);
+        createdWindow.sizeUpdated = false;
+    }
+    shader.SetMatrix("projection", orthoProjection);
+}
+
+AshenMat4 orthoProjection;
 AshenColorRectShader colorRectShader;
 AshenTexturedRectShader texRectShader;
 Drawable rectangle;
@@ -154,7 +184,7 @@ public GLuint ashenInternal_SendImageToGPU(AshenImage image) {
                  GL_UNSIGNED_BYTE, pixels);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glBindTexture(GL_TEXTURE_2D, 0);
