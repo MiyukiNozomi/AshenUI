@@ -44,11 +44,13 @@ void main() {
     AshenImage sniper;
     ashenLoadImage("test-pictures/sniper.amp", sniper);
 
+    ashenForceLines(true);
+
 	while (window.isVisible()) {
 		window.prepare(AshenColor.Orange);
 
-       // ashenDrawRectangle(doritos, 12, 12, 138, 256);
-      //  ashenDrawRectangle(sniper, 120, 0, sniper.width, sniper.height);
+        ashenDrawRectangle(doritos, 12, 12, 138, 256);
+        ashenDrawRectangle(sniper, 120, 0, sniper.width, sniper.height);
 
        // ashenDrawRectangle(AshenColor.Black, 0, 0, 120, 120);
        // ashenDrawRectangle(AshenColor.Magenta, 12, 12, 120, 120);

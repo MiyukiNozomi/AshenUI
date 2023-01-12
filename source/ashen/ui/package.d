@@ -99,6 +99,15 @@ HResult ashenInit(bstring title, int width, int height, out AshenWindow window) 
 }
 
 /**
+	Forces the renderer to render everything in wireframe mode or not.
+	the function will not have an effect if no window was created.
+*/
+void ashenForceLines(bool b) {
+	if(!createdWindow) return;
+	glPolygonMode(GL_FRONT_AND_BACK, b ? GL_LINE : GL_FILL);
+}
+
+/**
 	Creates a window, duh
 */
 private HResult ashenCreateWindow(bstring title, int width, int height, out AshenWindow window) {
